@@ -8,7 +8,7 @@ Dubbo _\|ˈdʌbəʊ\|_ is a high-performance, java based [RPC](https://en.wikipe
 
 ![](images//dubbo-architecture.jpg)
 
-Dubbo offers three key functionalities, which include interface based remote call, fault tolerance & load balancing, and automatic service registration & discovery. Dubbo framework is widely adopted inside Alibaba and outside by other companies including [jingdong](www.jd.com), [dangdang](http://www.dangdang.com), [qunar](https://www.qunar.com), [kaola](https://www.kaola.com), and many others.
+Dubbo offers three key functionalities, which include interface based remote call, fault tolerance & load balancing, and automatic service registration & discovery. Dubbo framework is widely adopted inside Alibaba and outside by other companies including [jingdong](http://www.jd.com), [dangdang](http://www.dangdang.com), [qunar](https://www.qunar.com), [kaola](https://www.kaola.com), and many others.
 
 ## [](#quick-start)Quick start
 
@@ -18,6 +18,16 @@ This guide gets you started with dubbo in Java with a simple working example. Yo
 
 * JDK: version 6 or higher
 * Maven: version 3 or higher
+
+#### Maven dependency
+
+```xml
+<dependency>
+    <groupId>com.alibaba</groupId>
+    <artifactId>dubbo</artifactId>
+    <version>2.5.4</version>
+</dependency>
+```
 
 #### Define service interface
 
@@ -113,6 +123,6 @@ public class Consumer {
 
 ## What's next
 
-* Dive deep into [dubbo user manual](https://dubbo.gitbooks.io/dubbo-user-book/) to find more details, or [![Gitter](https://badges.gitter.im/alibaba/dubbo.svg)](https://gitter.im/alibaba/dubbo?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
-* Read [dubbo admin manual](https://dubbo.gitbooks.io/dubbo-admin-book/) for dubbo application administration topics.
+* Dive deep into [dubbo user guide](https://dubbo.gitbooks.io/dubbo-user-book/) to find more details, or <a href="https://gitter.im/alibaba/dubbo?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge"><img class="inline-image" src="https://badges.gitter.im/alibaba/dubbo.svg"/></a>
+* Read [dubbo admin guide](https://dubbo.gitbooks.io/dubbo-admin-book/) for dubbo application administration topics.
 * Interested in how dubbo is designed, or want to contribute? Read [dubbo developer guide](https://dubbo.gitbooks.io/dubbo-dev-book/), and start to [hack the code](https://github.com/alibaba/dubbo).
