@@ -2,122 +2,117 @@
 layout: default
 ---
 
-Text can be **bold**, _italic_, or ~~strikethrough~~.
+## [](#introduction)Overview
 
-[Link to another page](another-page).
+Dubbo _\|ˈdʌbəʊ\|_ is a high-performance, java based [RPC](https://en.wikipedia.org/wiki/Remote_procedure_call) framework open-sourced by Alibaba. As in many RPC systems, dubbo is based around the idea of defining a service, specifying the methods that can be called remotely with their parameters and return types. On the server side, the server implements this interface and runs a dubbo server to handle client calls. On the client side, the client has a stub that provides the same methods as the server.
 
-There should be whitespace between paragraphs.
+![](images//dubbo-architecture.jpg)
 
-There should be whitespace between paragraphs. We recommend including a README, or a file with information about your project.
+Dubbo offers three key functionalities, which include interface based remote call, fault tolerance & load balancing, and automatic service registration & discovery. Dubbo framework is widely adopted inside Alibaba and outside by other companies including [jingdong](www.jd.com), [dangdang](http://www.dangdang.com), [qunar](https://www.qunar.com), [kaola](https://www.kaola.com), and many others.
 
-# [](#header-1)Header 1
+## [](#quick-start)Quick start
 
-This is a normal paragraph following a header. GitHub is a code hosting platform for version control and collaboration. It lets you and others work together on projects from anywhere.
+This guide gets you started with dubbo in Java with a simple working example. You could find the complete working samples from directory 'dubbo-demo' in [dubbo project](https://github.com/alibaba/dubbo) on github.
 
-## [](#header-2)Header 2
+#### Prerequisites
 
-> This is a blockquote following a header.
->
-> When something is important enough, you do it even if the odds are not in your favor.
+* JDK: version 6 or higher
+* Maven: version 3 or higher
 
-### [](#header-3)Header 3
+#### Define service interface
 
-```js
-// Javascript code with syntax highlighting.
-var fun = function lang(l) {
-  dateformat.i18n = require('./lang/' + l)
-  return true;
+Since both service provider and service consumer rely on the same interface, it is strongly recommended to put the interface definition below in one separated module which could be shared by both provider module and consumer module.
+
+```java
+package com.alibaba.dubbo.demo;
+
+public interface DemoService {
+    String sayHello(String name);
 }
 ```
 
-```ruby
-# Ruby code with syntax highlighting
-GitHubPages::Dependencies.gems.each do |gem, version|
-  s.add_dependency(gem, "= #{version}")
-end
+#### Implement service provider
+
+```java
+package com.alibaba.dubbo.demo.provider;
+import com.alibaba.dubbo.demo.DemoService;
+
+public class DemoServiceImpl implements DemoService {
+    public String sayHello(String name) {
+        return "Hello " + name;
+    }
+}
 ```
 
-#### [](#header-4)Header 4
+#### Configure service provider
 
-*   This is an unordered list following a header.
-*   This is an unordered list following a header.
-*   This is an unordered list following a header.
+The code snippet below shows how a dubbo service provider is configured with spring framework, which is recommended, however you could also use [API configuration](https://dubbo.gitbooks.io/dubbo-user-book/content/configuration/api.html) if it's preferred.
 
-##### [](#header-5)Header 5
-
-1.  This is an ordered list following a header.
-2.  This is an ordered list following a header.
-3.  This is an ordered list following a header.
-
-###### [](#header-6)Header 6
-
-| head1        | head two          | three |
-|:-------------|:------------------|:------|
-| ok           | good swedish fish | nice  |
-| out of stock | good and plenty   | nice  |
-| ok           | good `oreos`      | hmm   |
-| ok           | good `zoute` drop | yumm  |
-
-### There's a horizontal rule below this.
-
-* * *
-
-### Here is an unordered list:
-
-*   Item foo
-*   Item bar
-*   Item baz
-*   Item zip
-
-### And an ordered list:
-
-1.  Item one
-1.  Item two
-1.  Item three
-1.  Item four
-
-### And a nested list:
-
-- level 1 item
-  - level 2 item
-  - level 2 item
-    - level 3 item
-    - level 3 item
-- level 1 item
-  - level 2 item
-  - level 2 item
-  - level 2 item
-- level 1 item
-  - level 2 item
-  - level 2 item
-- level 1 item
-
-### Small image
-
-![](https://assets-cdn.github.com/images/icons/emoji/octocat.png)
-
-### Large image
-
-![](https://guides.github.com/activities/hello-world/branching.png)
-
-
-### Definition lists can be used with HTML syntax.
-
-<dl>
-<dt>Name</dt>
-<dd>Godzilla</dd>
-<dt>Born</dt>
-<dd>1952</dd>
-<dt>Birthplace</dt>
-<dd>Japan</dd>
-<dt>Color</dt>
-<dd>Green</dd>
-</dl>
-
-```
-Long, single-line code blocks should not wrap. They should horizontally scroll if they are too long. This line should be long enough to demonstrate this.
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+    <dubbo:application name="demo-provider"/>
+    <dubbo:registry address="multicast://224.5.6.7:1234"/>
+    <dubbo:protocol name="dubbo" port="20880"/>
+    <dubbo:service interface="com.alibaba.dubbo.demo.DemoService" ref="demoService"/>
+    <bean id="demoService" class="com.alibaba.dubbo.demo.provider.DemoServiceImpl"/>
+</beans>
 ```
 
+#### Start service provider
+
+```java
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class Provider {
+    public static void main(String[] args) throws Exception {
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(
+                new String[] {"META-INF/spring/dubbo-demo-provider.xml"});
+        context.start();
+        System.in.read(); // press any key to exit
+    }
+}
 ```
-The final element.
+
+#### Configure service consumer
+
+Again, the code below demonstrates spring integration
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+    <dubbo:application name="demo-consumer"/>
+    <dubbo:registry address="multicast://224.5.6.7:1234"/>
+    <dubbo:reference id="demoService" interface="com.alibaba.dubbo.demo.DemoService"/>
+</beans>
 ```
+
+#### Run service consumer
+
+```java
+import com.alibaba.dubbo.demo.DemoService;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class Consumer {
+    public static void main(String[] args) throws Exception {
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(
+                new String[]{"META-INF/spring/dubbo-demo-consumer.xml"});
+        context.start();
+        DemoService demoService = (DemoService) context.getBean("demoService"); // obtain proxy object for remote invocation
+        String hello = demoService.sayHello("world"); // execute remote invocation
+        System.out.println(hello); // show the result
+    }
+}
+```
+
+## What's next
+
+* Dive deep into [dubbo user manual](https://dubbo.gitbooks.io/dubbo-user-book/) to find more details, or [![Gitter](https://badges.gitter.im/alibaba/dubbo.svg)](https://gitter.im/alibaba/dubbo?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+* Read [dubbo admin manual](https://dubbo.gitbooks.io/dubbo-admin-book/) for dubbo application administration topics.
+* Interested in how dubbo is designed, or want to contribute? Read [dubbo developer guide](https://dubbo.gitbooks.io/dubbo-dev-book/), and start to [hack the code](https://github.com/alibaba/dubbo).
